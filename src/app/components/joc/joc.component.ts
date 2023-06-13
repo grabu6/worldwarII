@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Tropa } from 'src/app/model/implementations/Tropa';
+import { ServiceService } from 'src/app/service/service.service';
 
 @Component({
   selector: 'app-joc',
@@ -20,12 +21,23 @@ export class JocComponent{
     fiabilitat: 0
   };
 
+  constructor(private socketService: ServiceService) {}
+  
   ngOnInit(): void {
+    this.socketService.onTorn((jugador)=>{
+      if(jugador==='jugador1'){
+
+      }else if(jugador==='jugador2'){
+      }
+    });
+    
+    this.socketService.onActualitzarCamp((data:any) => {
+      this.posicioTropes = data;
+      this.actualitzarCanvas();
+    });
+  
     this.crearTropes();
   }
-
-
-  constructor() {}
 
   seleccionarTropa(tropa: Tropa): void {
     this.selectedTropa = tropa;
@@ -50,6 +62,7 @@ export class JocComponent{
   }
 
   moureTropa(direccio: string): void {
+
     if (this.selectedTropa) {
       const canvas = this.canvasElement.nativeElement;
       const ctx = canvas.getContext('2d');
@@ -101,6 +114,7 @@ export class JocComponent{
         };
       }
     }
+    this.socketService.moureTropa(direccio);
   }
 
   onMouseMove(event: MouseEvent): void {
@@ -154,6 +168,8 @@ export class JocComponent{
       this.selectedTropa = tropa;
   
       tropa.jugada = true;
+
+      this.socketService.ubicarTropa(tropa, x, y);
     }
   }
 
@@ -176,7 +192,21 @@ export class JocComponent{
       this.ubicarTropa(tropa, x, y);
       
       tropa.jugada = true;
-      console.log(tropa);
+    }
+  }
+
+  actualitzarCanvas(): void {
+    const canvas = this.canvasElement.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const posicioTropa of this.posicioTropes) {
+        const image = new Image();
+        image.src = '../../../../assets/Imatges/aSoldier.png';
+        image.onload = () => {
+          ctx.drawImage(image, posicioTropa.x, posicioTropa.y, 30, 30);
+        };
+      }
     }
   }
 }
