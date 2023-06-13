@@ -1,0 +1,59 @@
+.container{
+    display: flex;
+    flex-direction: row;
+    font-size: 8px;
+    justify-content: space-evenly;
+}
+.tropes{
+    background-color: gray;
+}
+canvas{
+    background-color: #97CF99;
+    height: 100%;
+}
+.grid{
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 10px;
+}
+.tropadiv{
+    background-color: orange;
+    display: flex;
+    flex-direction: row;
+    border-radius: 7px;
+}
+
+.moviments{
+    width: 55px;
+    height: 50px;
+}
+
+.moviments_btn{
+    height: 60px;
+}
+
+.botons_moure{
+    margin-top: 10px;
+    display:flex;
+    justify-content: center;
+}
+
+.bomba{
+    margin-top: 10px;
+}
+
+.soldat_img{
+    margin-top: 7.5px;
+    margin-left: 5px;
+}
+
+.statsTropa{
+    margin-left: 10px;
+}
+
+.tropaSeleccionadaStats{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    margin-left: 105px;
+}
