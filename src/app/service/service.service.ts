@@ -9,6 +9,8 @@ export class ServiceService {
   
   private socket: Socket;
 
+  private jugadorLocal: string = 'jugador1'; 
+
   constructor() {
     this.socket = io('http://localhost:3000');
     this.handleConnection();
@@ -28,10 +30,13 @@ export class ServiceService {
     this.socket.emit('ubicarTropa', { tropa, x, y });
   }
 
-  moureTropa(direccio: string): void {
-    this.socket.emit('moureTropa', { direccio });
+  moureTropa(tropa: Tropa, x: number, y: number): void {
+    this.socket.emit('moureTropa', { tropa, x, y });
   }
 
+  atacarTropa(): void {
+    this.socket.emit('atacarTropa');
+  }
 
   onTorn(callback: (jugador: string) => void): void {
     this.socket.on('torn', callback);
@@ -39,5 +44,13 @@ export class ServiceService {
 
   onActualitzarCamp(callback: any): void {
     this.socket.on('actualitzarCamp', callback);
+  }
+
+  tornCompletat(): void {
+    this.socket.emit('tornCompletat');
+  }
+
+  obtenirJugador(): string {
+    return this.jugadorLocal;
   }
 }

@@ -7,14 +7,25 @@ import { ServiceService } from 'src/app/service/service.service';
   templateUrl: './joc.component.html',
   styleUrls: ['./joc.component.css']
 })
-export class JocComponent{
+export class JocComponent implements OnInit {
   @ViewChild('canvasElement', { static: true })
   canvasElement!: ElementRef<HTMLCanvasElement>;
   tropes: Tropa[] = [];
-  selectedTropa: Tropa | null = null;
-  posicioTropes: { tropa: Tropa, x: number, y: number }[] = [];
+  jugadorActual: string = 'jugador1';
+  imagenJugador1: string = '../../../../assets/Imatges/aSoldier.png';
+  imagenJugador2: string = '../../../../assets/Imatges/enemySoldier.png';
 
-  statsTropa: { salut: number, defensa: number, atac: number, fiabilitat: number } = {
+  potJugar: boolean = true;
+  haTirat: boolean = false;
+  selectedTropa: Tropa | null = null;
+  posicioTropes: { tropa: Tropa; x: number; y: number }[] = [];
+
+  statsTropa: {
+    salut: number;
+    defensa: number;
+    atac: number;
+    fiabilitat: number;
+  } = {
     salut: 0,
     defensa: 0,
     atac: 0,
@@ -22,20 +33,22 @@ export class JocComponent{
   };
 
   constructor(private socketService: ServiceService) {}
-  
-  ngOnInit(): void {
-    this.socketService.onTorn((jugador)=>{
-      if(jugador==='jugador1'){
 
-      }else if(jugador==='jugador2'){
-      }
+  ngOnInit(): void {
+    this.socketService.onTorn((jugador) => {
+      this.potJugar = jugador === this.socketService.obtenirJugador();
+      this.haTirat = false;
+      this.jugadorActual = jugador;
+      console.log(jugador);
+      console.log('Torn del jugador: ', jugador);
+      console.log('Puede jugar: ', this.potJugar);
     });
-    
-    this.socketService.onActualitzarCamp((data:any) => {
+
+    this.socketService.onActualitzarCamp((data: any) => {
       this.posicioTropes = data;
       this.actualitzarCanvas();
     });
-  
+
     this.crearTropes();
   }
 
@@ -51,10 +64,15 @@ export class JocComponent{
     const canvasRect = this.canvasElement.nativeElement.getBoundingClientRect();
     const x = event.clientX - canvasRect.left;
     const y = event.clientY - canvasRect.top;
-  
+
     for (let i = this.posicioTropes.length - 1; i >= 0; i--) {
       const posicioTropes = this.posicioTropes[i];
-      if (x >= posicioTropes.x && x <= posicioTropes.x + 30 && y >= posicioTropes.y && y <= posicioTropes.y + 30) {
+      if (
+        x >= posicioTropes.x &&
+        x <= posicioTropes.x + 30 &&
+        y >= posicioTropes.y &&
+        y <= posicioTropes.y + 30
+      ) {
         this.seleccionarTropa(posicioTropes.tropa);
         break;
       }
@@ -62,17 +80,16 @@ export class JocComponent{
   }
 
   moureTropa(direccio: string): void {
-
     if (this.selectedTropa) {
       const canvas = this.canvasElement.nativeElement;
       const ctx = canvas.getContext('2d');
-  
+
       if (ctx) {
         ctx.clearRect(this.selectedTropa.x, this.selectedTropa.y, 30, 30);
-  
+
         let newX = this.selectedTropa.x;
         let newY = this.selectedTropa.y;
-  
+
         switch (direccio) {
           case 'amunt':
             newY -= 10;
@@ -87,34 +104,41 @@ export class JocComponent{
             newX += 10;
             break;
         }
-  
+
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
         const troopSize = 30;
-  
+
         if (newX < 0) {
           newX = 0;
         } else if (newX + troopSize > canvasWidth) {
           newX = canvasWidth - troopSize;
         }
-  
+
         if (newY < 0) {
           newY = 0;
         } else if (newY + troopSize > canvasHeight) {
           newY = canvasHeight - troopSize;
         }
-  
+
         this.selectedTropa.x = newX;
         this.selectedTropa.y = newY;
-  
+
         const image = new Image();
-        image.src = '../../../../assets/Imatges/aSoldier.png';
+        const imageSrc =
+        this.jugadorActual === 'jugador1'
+              ? this.imagenJugador1
+              : this.imagenJugador2;
+        image.src = imageSrc;
         image.onload = () => {
           ctx.drawImage(image, newX, newY, 30, 30);
         };
+        const tropa = this.selectedTropa;
+        const x = newX;
+        const y = newY;
+        this.socketService.moureTropa(tropa, x, y);
       }
     }
-    this.socketService.moureTropa(direccio);
   }
 
   onMouseMove(event: MouseEvent): void {
@@ -124,7 +148,12 @@ export class JocComponent{
 
     if (this.selectedTropa) {
       for (const posicionTropa of this.posicioTropes) {
-        if (x >= posicionTropa.x && x <= posicionTropa.x + 30 && y >= posicionTropa.y && y <= posicionTropa.y + 30) {
+        if (
+          x >= posicionTropa.x &&
+          x <= posicionTropa.x + 30 &&
+          y >= posicionTropa.y &&
+          y <= posicionTropa.y + 30
+        ) {
           this.statsTropa.salut = posicionTropa.tropa.salut;
           this.statsTropa.defensa = posicionTropa.tropa.defensa;
           this.statsTropa.atac = posicionTropa.tropa.atac;
@@ -152,24 +181,29 @@ export class JocComponent{
   ubicarTropa(tropa: Tropa, x: number, y: number): void {
     const canvas = this.canvasElement.nativeElement;
     const ctx = canvas.getContext('2d');
-  
+
     if (ctx) {
       const image = new Image();
-      image.src = '../../../../assets/Imatges/aSoldier.png';
+      const imageSrc =
+      this.jugadorActual === 'jugador1'
+            ? this.imagenJugador1
+            : this.imagenJugador2;
+      image.src = imageSrc;
       image.onload = () => {
         ctx.drawImage(image, x, y, 30, 30);
       };
-  
+
       tropa.x = x;
       tropa.y = y;
-  
+
       this.posicioTropes.push({ tropa: tropa, x: x, y: y });
-  
+
       this.selectedTropa = tropa;
-  
+
       tropa.jugada = true;
 
       this.socketService.ubicarTropa(tropa, x, y);
+      this.jugadorActual = (this.jugadorActual === 'jugador1') ? 'jugador2' : 'jugador1';
     }
   }
 
@@ -190,7 +224,7 @@ export class JocComponent{
       const x = event.clientX - canvasRect.left;
       const y = event.clientY - canvasRect.top;
       this.ubicarTropa(tropa, x, y);
-      
+
       tropa.jugada = true;
     }
   }
@@ -202,7 +236,11 @@ export class JocComponent{
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (const posicioTropa of this.posicioTropes) {
         const image = new Image();
-        image.src = '../../../../assets/Imatges/aSoldier.png';
+        const imageSrc =
+          this.jugadorActual === 'jugador1'
+            ? this.imagenJugador1
+            : this.imagenJugador2;
+        image.src = imageSrc;
         image.onload = () => {
           ctx.drawImage(image, posicioTropa.x, posicioTropa.y, 30, 30);
         };
@@ -210,3 +248,4 @@ export class JocComponent{
     }
   }
 }
+
