@@ -12,8 +12,12 @@ export class JocComponent implements OnInit {
   canvasElement!: ElementRef<HTMLCanvasElement>;
   tropes: Tropa[] = [];
   jugadorActual: string = 'jugador1';
+  tropaAtacant: Tropa | null = null;
+  tropaObjectiu: Tropa | null = null;
   imagenJugador1: string = '../../../../assets/Imatges/aSoldier.png';
   imagenJugador2: string = '../../../../assets/Imatges/enemySoldier.png';
+ 
+
 
   potJugar: boolean = true;
   haTirat: boolean = false;
@@ -54,30 +58,75 @@ export class JocComponent implements OnInit {
     this.crearTropes();
   }
 
-  seleccionarTropa(tropa: Tropa): void {
-    this.selectedTropa = tropa;
-    this.statsTropa.salut = tropa.salut;
-    this.statsTropa.defensa = tropa.defensa;
-    this.statsTropa.atac = tropa.atac;
-    this.statsTropa.fiabilitat = tropa.fiabilitat;
+  seleccionarTropaAtacant(tropa: Tropa): void {
+    this.tropaAtacant = tropa;
+    console.log('Tropa atacant seleccionada: ', tropa);
+  }
+
+  seleccionarTropaObjectiu(tropa: Tropa): void {
+    this.tropaObjectiu = tropa;
+    console.log('Tropa objectiu seleccionada: ', tropa);
+  }
+
+  realitzarAtac(): void {
+    if (this.tropaAtacant && this.tropaObjectiu) {
+      console.log('Atacant: ', this.tropaAtacant, 'Objectiu: ', this.tropaObjectiu);
+  
+      const distanciaX = this.tropaAtacant.x - this.tropaObjectiu.x;
+      const distanciaY = this.tropaAtacant.y - this.tropaObjectiu.y;
+      const distancia = Math.sqrt(Math.pow(distanciaX, 2) + Math.pow(distanciaY, 2));
+  
+      if (distancia < 120) {
+        const multiplicador=150;
+        const A = this.tropaAtacant.atac; 
+        const M = this.tropes.length > 0 ? this.mitjanaAtacTropesReserva() : 1; 
+        const F = this.tropaAtacant.fiabilitat; 
+        const R = Math.random();
+        let forcaAtac = A * R *  (F / 100) / M; 
+        forcaAtac *= multiplicador;
+        const D = this.tropaObjectiu.defensa; 
+
+        const impacteAtac = 50+forcaAtac / D; 
+
+        this.tropaObjectiu.salut -= impacteAtac;
+
+        console.log('Tropa atacant:', this.tropaAtacant);
+        console.log('Tropa objectiu:', this.tropaObjectiu);
+        console.log('Dany causat:', impacteAtac);
+
+        if (this.tropaObjectiu.salut < 0) {
+          const index = this.posicioTropes.findIndex(posicio => posicio.tropa === this.tropaObjectiu);
+          if (index !== -1) {
+            this.posicioTropes.splice(index, 1);
+            console.log('La tropa objectiu ha estat eliminada.');
+            
+            this.socketService.eliminarTropa(this.tropaObjectiu);
+
+            this.tropaAtacant.x = this.tropaObjectiu.x;
+            this.tropaAtacant.y = this.tropaObjectiu.y;
+          }
+        }
+      } else {
+        console.log('La distància entre les tropes és superior a 120. No es pot realitzar l\'atac.');
+      }
+    }
   }
 
   onCanvasClick(event: MouseEvent): void {
+    console.log('Click on canvas');
     const canvasRect = this.canvasElement.nativeElement.getBoundingClientRect();
     const x = event.clientX - canvasRect.left;
     const y = event.clientY - canvasRect.top;
 
     for (let i = this.posicioTropes.length - 1; i >= 0; i--) {
       const posicioTropes = this.posicioTropes[i];
-      if (
-        x >= posicioTropes.x &&
-        x <= posicioTropes.x + 30 &&
-        y >= posicioTropes.y &&
-        y <= posicioTropes.y + 30
-      ) {
-        console.log(posicioTropes.tropa);
-        this.seleccionarTropa(posicioTropes.tropa);
-        break;
+
+        if (this.tropaAtacant === null) {
+          this.seleccionarTropaAtacant(posicioTropes.tropa);
+        } else if (this.tropaObjectiu === null) {
+          this.seleccionarTropaObjectiu(posicioTropes.tropa);
+          break;
+        
       }
     }
   }
@@ -223,8 +272,6 @@ export class JocComponent implements OnInit {
 
       this.selectedTropa = tropa;
 
-      tropa.jugada = true;
-
       this.socketService.ubicarTropa(tropa, x, y,'');
     }
   }
@@ -269,6 +316,14 @@ export class JocComponent implements OnInit {
         };
       }
     }
+  }
+
+  mitjanaAtacTropesReserva() {
+    let sumaAtac = 0;
+    for (const tropaReserva of this.tropes) {
+      sumaAtac += tropaReserva.atac;
+    }
+    return sumaAtac / this.tropes.length;
   }
 }
 

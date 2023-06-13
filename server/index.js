@@ -60,7 +60,7 @@ io.on('connection', socket => {
     io.emit('actualitzarCamp', Object.values(jugadores));
   });
 
-  socket.on('atacarTropa', atac => {
+  socket.on('eliminarTropa', atac => {
     console.log("Tropa atacada");
     console.log("Jugador:", jugador, "con id:", socket.id);
 

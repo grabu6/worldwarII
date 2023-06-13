@@ -9,7 +9,6 @@
 }
 canvas{
     background-color: #97CF99;
-    height: 100%;
 }
 .grid{
     display: grid;
@@ -33,13 +32,19 @@ canvas{
 }
 
 .botons_moure{
-    margin-top: 10px;
+    margin-top: 40px;
+    display:flex;
+    justify-content: center;
+}
+
+.botons_diagonal{
+    margin-top: 40px;
     display:flex;
     justify-content: center;
 }
 
 .bomba{
-    margin-top: 10px;
+    margin-top: 40px;
 }
 
 .soldat_img{

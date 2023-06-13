@@ -1,7 +1,8 @@
-<div class="container">
+
+<div class="container">  
     <div>
-        <canvas #canvasElement width="500" height="500" (click)="onCanvasClick($event)" (mousemove)="onMouseMove($event)" (dragover)="onDragOverCanvas($event)" (drop)="onDropCanvas($event)"></canvas>
-    </div>    
+        <canvas #canvasElement width="1000" height="1000" (click)="onCanvasClick($event)" (mousemove)="onMouseMove($event)" (dragover)="onDragOverCanvas($event)" (drop)="onDropCanvas($event)"></canvas>
+    </div>  
     <div class="tropes">
         <div class="tropaSeleccionadaStats">
             <p>HEALTH: {{ statsTropa.salut }}</p>
@@ -12,7 +13,7 @@
         </div>
         <div class="grid">
             <div *ngFor="let tropa of tropes">
-                <div class="tropadiv" draggable="true" (dragstart)="onDragStart($event, tropa)" *ngIf="!tropa.jugada">
+                <div class="tropadiv" draggable="true" (dragstart)="onDragStart($event, tropa)">
                     <div class="imagediv">
                       <img class="soldat_img" src="../../../assets/Imatges/aSoldier.png">
                     </div>
@@ -40,7 +41,7 @@
             <button class="moviments_btn" (click)="moureTropa('diagonal_inferior_dreta')"><img class="moviments" src="../../../assets/Imatges/down_right.png"></button>
         </div>
         <div class="bomba">
-            <button><img class="moviments" src="../../../assets/Imatges/Bomb.webp"></button>
+            <button (click)="realitzarAtac()"><img class="moviments" src="../../../assets/Imatges/Bomb.webp"></button>
         </div>
     </div>
 </div>

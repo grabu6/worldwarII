@@ -34,8 +34,9 @@ export class ServiceService {
     this.socket.emit('moureTropa', { tropa, x, y });
   }
 
-  atacarTropa(): void {
-    this.socket.emit('atacarTropa');
+  eliminarTropa(tropa:Tropa): void {
+    console.log(tropa);
+    this.socket.emit('eliminarTropa', tropa);
   }
 
   onTorn(callback: (jugador: string) => void): void {

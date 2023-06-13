@@ -8,7 +8,6 @@ export class Tropa implements ITropa {
   magia: number;
   x: number;
   y: number;
-  jugada: boolean;
 
   constructor() {
     this.salut = 100;
@@ -25,6 +24,5 @@ export class Tropa implements ITropa {
 
     this.x = 0;
     this.y = 0;
-    this.jugada = false;
   }
 }
