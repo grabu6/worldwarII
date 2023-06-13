@@ -61,16 +61,16 @@ export class JocComponent{
         let newY = this.selectedTropa.y;
   
         switch (direccio) {
-          case 'arriba':
+          case 'amunt':
             newY -= 10;
             break;
-          case 'abajo':
+          case 'avall':
             newY += 10;
             break;
-          case 'izquierda':
+          case 'esquerra':
             newX -= 10;
             break;
-          case 'derecha':
+          case 'dreta':
             newX += 10;
             break;
         }
