@@ -8,6 +8,9 @@ const io = require("socket.io")(httpServer, {
   }
 });
 
+const imagenJugador2 = '../../../../assets/Imatges/enemySoldier.png';
+
+
 httpServer.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });
@@ -31,9 +34,10 @@ io.on('connection', socket => {
     jugadores[socket.id] = {
       tropa: data.tropa,
       x: data.x,
-      y: data.y
+      y: data.y,
+      imatge: imagenJugador2
     };
-
+    console.log(imagenJugador2);
     io.emit('actualitzarCamp', Object.values(jugadores));
 
     if (jugadorCount === 2) {

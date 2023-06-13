@@ -26,8 +26,8 @@ export class ServiceService {
     });
   }
 
-  ubicarTropa(tropa: Tropa, x: number, y: number): void {
-    this.socket.emit('ubicarTropa', { tropa, x, y });
+  ubicarTropa(tropa: Tropa, x: number, y: number, imatge:string): void {
+    this.socket.emit('ubicarTropa', { tropa, x, y,imatge });
   }
 
   moureTropa(tropa: Tropa, x: number, y: number): void {

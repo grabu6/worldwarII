@@ -18,7 +18,7 @@ export class JocComponent implements OnInit {
   potJugar: boolean = true;
   haTirat: boolean = false;
   selectedTropa: Tropa | null = null;
-  posicioTropes: { tropa: Tropa; x: number; y: number }[] = [];
+  posicioTropes: { tropa: Tropa; x: number; y: number, imatge:string }[] = [];
 
   statsTropa: {
     salut: number;
@@ -181,13 +181,10 @@ export class JocComponent implements OnInit {
   ubicarTropa(tropa: Tropa, x: number, y: number): void {
     const canvas = this.canvasElement.nativeElement;
     const ctx = canvas.getContext('2d');
-
+    
     if (ctx) {
       const image = new Image();
-      const imageSrc =
-      this.jugadorActual === 'jugador1'
-            ? this.imagenJugador1
-            : this.imagenJugador2;
+      const imageSrc =this.imagenJugador1;
       image.src = imageSrc;
       image.onload = () => {
         ctx.drawImage(image, x, y, 30, 30);
@@ -196,14 +193,18 @@ export class JocComponent implements OnInit {
       tropa.x = x;
       tropa.y = y;
 
-      this.posicioTropes.push({ tropa: tropa, x: x, y: y });
+      this.posicioTropes.push({ tropa: tropa, x: x, y: y, imatge: '' });
+
+      const index = this.tropes.findIndex((t) => t.atac === tropa.atac);
+      if (index !== -1) {
+        this.tropes.splice(index, 1);
+      }
 
       this.selectedTropa = tropa;
 
       tropa.jugada = true;
 
-      this.socketService.ubicarTropa(tropa, x, y);
-      this.jugadorActual = (this.jugadorActual === 'jugador1') ? 'jugador2' : 'jugador1';
+      this.socketService.ubicarTropa(tropa, x, y,'');
     }
   }
 
@@ -236,10 +237,7 @@ export class JocComponent implements OnInit {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (const posicioTropa of this.posicioTropes) {
         const image = new Image();
-        const imageSrc =
-          this.jugadorActual === 'jugador1'
-            ? this.imagenJugador1
-            : this.imagenJugador2;
+        const imageSrc =posicioTropa.imatge || this.imagenJugador1;
         image.src = imageSrc;
         image.onload = () => {
           ctx.drawImage(image, posicioTropa.x, posicioTropa.y, 30, 30);
