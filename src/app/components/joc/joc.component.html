@@ -5,9 +5,10 @@
     <div class="tropes">
         <div class="tropaSeleccionadaStats">
             <p>HEALTH: {{ statsTropa.salut }}</p>
-            <p>ATTACK: {{ statsTropa.defensa }}</p>
-            <p>DEFENSE: {{ statsTropa.atac }}</p>
+            <p>ATTACK: {{ statsTropa.atac }}</p>
+            <p>DEFENSE: {{ statsTropa.defensa }}</p>
             <p>FIABILITY: {{ statsTropa.fiabilitat }}</p>
+            <p>MÀGIA: {{statsTropa.magia}}</p>
         </div>
         <div class="grid">
             <div *ngFor="let tropa of tropes">
@@ -20,6 +21,7 @@
                       <p>Defensa: {{ tropa.defensa }}</p>
                       <p>Atac: {{ tropa.atac }}</p>
                       <p>Fiabilitat: {{ tropa.fiabilitat }}</p>
+                      <p>Màgia: {{ tropa.magia }}</p>
                   </div>
               </div>
             </div>
@@ -30,7 +32,12 @@
             <button class="moviments_btn" (click)="moureTropa('avall')"><img class="moviments" src="../../../assets/Imatges/Down.png"></button>
             <button class="moviments_btn" (click)="moureTropa('esquerra')"><img class="moviments" src="../../../assets/Imatges/Left.png"></button>
             <button class="moviments_btn" (click)="moureTropa('dreta')"><img class="moviments" src="../../../assets/Imatges/Right.png"></button>
-
+        </div>
+        <div class="botons_diagonal">
+            <button class="moviments_btn" (click)="moureTropa('diagonal_superior_esquerra')"><img class="moviments" src="../../../assets/Imatges/up_left.png"></button>
+            <button class="moviments_btn" (click)="moureTropa('diagonal_inferior_esquerra')"><img class="moviments" src="../../../assets/Imatges/down_left.png"></button>
+            <button class="moviments_btn" (click)="moureTropa('diagonal_superior_dreta')"><img class="moviments" src="../../../assets/Imatges/up_right.png"></button>
+            <button class="moviments_btn" (click)="moureTropa('diagonal_inferior_dreta')"><img class="moviments" src="../../../assets/Imatges/down_right.png"></button>
         </div>
         <div class="bomba">
             <button><img class="moviments" src="../../../assets/Imatges/Bomb.webp"></button>

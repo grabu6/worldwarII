@@ -25,11 +25,13 @@ export class JocComponent implements OnInit {
     defensa: number;
     atac: number;
     fiabilitat: number;
+    magia: number;
   } = {
     salut: 0,
     defensa: 0,
     atac: 0,
-    fiabilitat: 0
+    fiabilitat: 0,
+    magia:0
   };
 
   constructor(private socketService: ServiceService) {}
@@ -73,6 +75,7 @@ export class JocComponent implements OnInit {
         y >= posicioTropes.y &&
         y <= posicioTropes.y + 30
       ) {
+        console.log(posicioTropes.tropa);
         this.seleccionarTropa(posicioTropes.tropa);
         break;
       }
@@ -83,13 +86,13 @@ export class JocComponent implements OnInit {
     if (this.selectedTropa) {
       const canvas = this.canvasElement.nativeElement;
       const ctx = canvas.getContext('2d');
-
+  
       if (ctx) {
         ctx.clearRect(this.selectedTropa.x, this.selectedTropa.y, 30, 30);
-
+  
         let newX = this.selectedTropa.x;
         let newY = this.selectedTropa.y;
-
+  
         switch (direccio) {
           case 'amunt':
             newY -= 10;
@@ -103,36 +106,53 @@ export class JocComponent implements OnInit {
           case 'dreta':
             newX += 10;
             break;
+          case 'diagonal_superior_esquerra':
+            newX -= 10;
+            newY -= 10;
+            break;
+          case 'diagonal_superior_dreta':
+            newX += 10;
+            newY -= 10;
+            break;
+          case 'diagonal_inferior_esquerra':
+            newX -= 10;
+            newY += 10;
+            break;
+          case 'diagonal_inferior_dreta':
+            newX += 10;
+            newY += 10;
+            break;
         }
-
+  
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
         const troopSize = 30;
-
+  
         if (newX < 0) {
           newX = 0;
         } else if (newX + troopSize > canvasWidth) {
           newX = canvasWidth - troopSize;
         }
-
+  
         if (newY < 0) {
           newY = 0;
         } else if (newY + troopSize > canvasHeight) {
           newY = canvasHeight - troopSize;
         }
-
+  
         this.selectedTropa.x = newX;
         this.selectedTropa.y = newY;
-
+  
         const image = new Image();
         const imageSrc =
-        this.jugadorActual === 'jugador1'
-              ? this.imagenJugador1
-              : this.imagenJugador2;
+          this.jugadorActual === 'jugador1'
+            ? this.imagenJugador1
+            : this.imagenJugador2;
         image.src = imageSrc;
         image.onload = () => {
           ctx.drawImage(image, newX, newY, 30, 30);
         };
+  
         const tropa = this.selectedTropa;
         const x = newX;
         const y = newY;
@@ -140,7 +160,7 @@ export class JocComponent implements OnInit {
       }
     }
   }
-
+  
   onMouseMove(event: MouseEvent): void {
     const canvasRect = this.canvasElement.nativeElement.getBoundingClientRect();
     const x = event.clientX - canvasRect.left;
@@ -166,7 +186,8 @@ export class JocComponent implements OnInit {
         salut: 0,
         defensa: 0,
         atac: 0,
-        fiabilitat: 0
+        fiabilitat: 0,
+        magia:0
       };
     }
   }
@@ -225,7 +246,11 @@ export class JocComponent implements OnInit {
       const x = event.clientX - canvasRect.left;
       const y = event.clientY - canvasRect.top;
       this.ubicarTropa(tropa, x, y);
-
+      console.log(tropa);
+      const tropa2 = Object.assign({}, tropa);
+      tropa2.x += 20;
+      this.ubicarTropa(tropa2, x + 20, y);
+      console.log(tropa2);
       tropa.jugada = true;
     }
   }
